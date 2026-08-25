@@ -2,137 +2,352 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>AI Event Opening</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#020a14">
+<title>AI Palm Touch Event System</title>
 <style>
+:root{
+  --blue:#20bfff;
+  --blue2:#0878ff;
+  --green:#42ff87;
+  --bg:#020811;
+  --panel:rgba(3,18,32,.76);
+}
 *{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#020811;font-family:Arial,Helvetica,sans-serif}
-body{color:#54c9ff;touch-action:manipulation}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Arial,Helvetica,sans-serif}
+body{touch-action:none;color:var(--blue)}
 #app{position:relative;width:100vw;height:100vh;overflow:hidden;background:
-radial-gradient(circle at center,rgba(0,125,190,.14),transparent 45%),
-linear-gradient(135deg,#020812,#041522 55%,#01060b)}
-canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.65}
-.scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 5px);mix-blend-mode:screen}
-.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,transparent 45%,rgba(0,0,0,.7) 100%)}
-.hud{position:absolute;inset:3.5vh 3.5vw;border:1px solid rgba(55,190,255,.25);pointer-events:none}
-.hud:before,.hud:after{content:"";position:absolute;width:55px;height:55px;border-color:#31bfff;border-style:solid}
+ radial-gradient(circle at 50% 48%,rgba(0,135,220,.16),transparent 38%),
+ radial-gradient(circle at 50% 100%,rgba(0,70,130,.16),transparent 55%),
+ linear-gradient(145deg,#01060c,#031321 55%,#01050a)}
+canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.scanlines,.vignette{position:absolute;inset:0;pointer-events:none}
+.scanlines{background:repeating-linear-gradient(to bottom,rgba(255,255,255,.025) 0 1px,transparent 1px 5px)}
+.vignette{background:radial-gradient(circle,transparent 45%,rgba(0,0,0,.72) 100%)}
+
+.hud{
+ position:absolute;inset:3vh 3vw;border:1px solid rgba(32,191,255,.25);
+ pointer-events:none;transition:.8s;
+}
+.hud:before,.hud:after,.c2,.c3{
+ content:"";position:absolute;width:62px;height:62px;border-color:var(--blue);border-style:solid;transition:.8s
+}
 .hud:before{left:-1px;top:-1px;border-width:2px 0 0 2px}
 .hud:after{right:-1px;bottom:-1px;border-width:0 2px 2px 0}
-.corner2,.corner3{position:absolute;width:55px;height:55px;border-color:#31bfff;border-style:solid}
-.corner2{right:-1px;top:-1px;border-width:2px 2px 0 0}
-.corner3{left:-1px;bottom:-1px;border-width:0 0 2px 2px}
-.topbar,.bottombar{position:absolute;left:6vw;right:6vw;display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:3px;text-transform:uppercase;opacity:.75}
-.topbar{top:6vh}.bottombar{bottom:5vh}
-.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(720px,82vw);text-align:center}
-.ring{width:min(300px,42vw);aspect-ratio:1;margin:auto;position:relative;border:1px solid rgba(56,197,255,.5);border-radius:50%;box-shadow:0 0 30px rgba(0,170,255,.15),inset 0 0 35px rgba(0,170,255,.08)}
-.ring:before,.ring:after{content:"";position:absolute;inset:12%;border:1px dashed rgba(56,197,255,.5);border-radius:50%;animation:spin 12s linear infinite}
-.ring:after{inset:24%;border-style:solid;border-color:rgba(56,197,255,.2);animation:spinReverse 8s linear infinite}
-.cross{position:absolute;left:50%;top:50%;width:70%;height:70%;transform:translate(-50%,-50%);border:1px solid rgba(56,197,255,.25);border-radius:50%}
-.cross:before,.cross:after{content:"";position:absolute;background:rgba(56,197,255,.35)}
-.cross:before{width:100%;height:1px;top:50%;left:0}.cross:after{height:100%;width:1px;left:50%;top:0}
-.hand{font-size:min(100px,14vw);line-height:1;position:absolute;left:50%;top:50%;transform:translate(-50%,-53%);filter:drop-shadow(0 0 18px #24bfff);animation:tap 1.25s ease-in-out infinite}
-.instruction{margin-top:30px;font-size:clamp(18px,3vw,28px);font-weight:700;letter-spacing:7px;text-shadow:0 0 15px #26bfff}
-.sub{margin-top:10px;font-size:11px;letter-spacing:4px;opacity:.65}
+.c2{right:-1px;top:-1px;border-width:2px 2px 0 0}
+.c3{left:-1px;bottom:-1px;border-width:0 0 2px 2px}
+
+.top,.bottom{
+ position:absolute;left:6vw;right:6vw;display:flex;justify-content:space-between;
+ font-size:10px;letter-spacing:3px;opacity:.72;text-transform:uppercase;z-index:4
+}
+.top{top:5vh}.bottom{bottom:4vh}
+
+.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,88vw);text-align:center;z-index:3}
+.scanner{
+ width:min(330px,68vw);aspect-ratio:1;margin:auto;position:relative;
+ border:1px solid rgba(32,191,255,.35);border-radius:50%;
+ box-shadow:0 0 40px rgba(20,170,255,.13),inset 0 0 50px rgba(20,170,255,.07);
+}
+.scanner:before,.scanner:after{
+ content:"";position:absolute;border-radius:50%;pointer-events:none
+}
+.scanner:before{inset:7%;border:1px dashed rgba(32,191,255,.55);animation:spin 10s linear infinite}
+.scanner:after{inset:16%;border:1px solid rgba(32,191,255,.2);animation:spinReverse 7s linear infinite}
+.ringProgress{
+ position:absolute;inset:1.8%;border-radius:50%;
+ background:conic-gradient(var(--blue) 0deg,transparent 0deg);
+ -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
+ mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
+ transition:background .05s linear;
+}
+.palm{
+ position:absolute;left:50%;top:50%;width:52%;height:63%;transform:translate(-50%,-50%);
+ filter:drop-shadow(0 0 15px rgba(32,191,255,.75));
+}
+.palm svg{width:100%;height:100%;overflow:visible}
+.palm path{fill:rgba(20,170,255,.08);stroke:var(--blue);stroke-width:2}
+.palm .line{fill:none;stroke:rgba(100,220,255,.7);stroke-width:1.2}
+.scanBeam{
+ position:absolute;left:10%;right:10%;top:50%;height:2px;background:var(--blue);
+ box-shadow:0 0 18px 5px rgba(32,191,255,.35);animation:scan 2.1s ease-in-out infinite
+}
+.readout{
+ position:absolute;left:7%;top:20%;font-size:9px;line-height:1.8;text-align:left;
+ letter-spacing:2px;color:#59d7ff
+}
+.readout.right{left:auto;right:7%;text-align:right}
+.title{margin-top:24px;font-size:clamp(18px,3vw,28px);font-weight:800;letter-spacing:5px;text-shadow:0 0 18px currentColor}
+.sub{margin-top:9px;font-size:10px;letter-spacing:3px;opacity:.68}
+.palmHint{margin-top:16px;font-size:11px;letter-spacing:2px;opacity:.55}
+.progressText{font-size:clamp(50px,9vw,88px);font-weight:900;letter-spacing:4px;text-shadow:0 0 28px currentColor;margin-top:15px}
+.status{font-size:11px;letter-spacing:3px;opacity:.7;margin-top:8px}
 #loading,#ready{display:none}
 #loading.active,#ready.active{display:block}
-.progressWrap{margin:28px auto 0;width:min(560px,75vw)}
-.progress{height:6px;border:1px solid rgba(55,200,255,.7);padding:1px}
-.fill{height:100%;width:0;background:#48cfff;box-shadow:0 0 18px #2abfff}
-.percent{font-size:clamp(44px,8vw,76px);font-weight:800;letter-spacing:5px;margin-top:20px;text-shadow:0 0 25px #21bfff}
-.status{font-size:12px;letter-spacing:4px;opacity:.75;margin-top:8px}
-.readyMode{color:#5dff9b}
-.readyMode .hud{border-color:rgba(70,255,145,.3)}
-.readyMode .hud:before,.readyMode .hud:after,.readyMode .corner2,.readyMode .corner3{border-color:#4dff91}
-.readyMode .ring{border-color:rgba(75,255,145,.6);box-shadow:0 0 35px rgba(50,255,135,.22),inset 0 0 40px rgba(50,255,135,.1)}
-.readyMode .ring:before,.readyMode .ring:after{border-color:rgba(75,255,145,.55)}
-.readyMode .cross:before,.readyMode .cross:after{background:rgba(75,255,145,.4)}
-.readyMode .instruction,.readyMode .percent{color:#6dffa6;text-shadow:0 0 18px #39ff8b}
-.readyMode .fill{background:#55ff9b;box-shadow:0 0 20px #39ff8b}
-.fade{animation:fadeIn .6s ease}
-@keyframes tap{0%,100%{transform:translate(-50%,-53%)}50%{transform:translate(-50%,-43%)}}
-@keyframes spin{to{transform:rotate(360deg)}}@keyframes spinReverse{to{transform:rotate(-360deg)}}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@media(max-width:700px){.topbar,.bottombar{font-size:8px;letter-spacing:2px}.hud{inset:2.5vh 2.5vw}.instruction{letter-spacing:4px}}
+
+.ready{color:var(--green)}
+.ready .hud{border-color:rgba(66,255,135,.3)}
+.ready .hud:before,.ready .hud:after,.ready .c2,.ready .c3{border-color:var(--green)}
+.ready #app{}
+.ready .scanner{border-color:rgba(66,255,135,.55);box-shadow:0 0 45px rgba(66,255,135,.18),inset 0 0 50px rgba(66,255,135,.07)}
+.ready .scanner:before,.ready .scanner:after{border-color:rgba(66,255,135,.55)}
+.ready .palm path{stroke:var(--green)}
+.ready .palm .line{stroke:rgba(120,255,170,.72)}
+.ready .scanBeam{background:var(--green);box-shadow:0 0 20px 5px rgba(66,255,135,.4)}
+.ready .ringProgress{background:conic-gradient(var(--green) 360deg,#12351f 360deg)}
+.ready .title,.ready .progressText{color:var(--green)}
+.ready .bottom{color:var(--green)}
+
+.flash{position:absolute;inset:0;background:var(--green);opacity:0;pointer-events:none;z-index:8}
+.flash.go{animation:flash .65s ease-out}
+.fade{animation:fade .5s ease}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinReverse{to{transform:rotate(-360deg)}}
+@keyframes scan{0%,100%{transform:translateY(-125px);opacity:.15}50%{transform:translateY(125px);opacity:1}}
+@keyframes fade{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
+@keyframes flash{0%{opacity:0}25%{opacity:.28}100%{opacity:0}}
 </style>
 </head>
+
 <body>
 <div id="app">
-<canvas id="particles"></canvas>
-<div class="hud"><span class="corner2"></span><span class="corner3"></span></div>
-<div class="topbar"><span>AI EVENT CONTROL</span><span id="clock">00:00:00</span></div>
-<div class="bottombar"><span>SECURE INTERFACE</span><span>READY / TOUCH INPUT</span></div>
-<div class="center" id="standby">
-  <div class="ring"><div class="cross"></div><div class="hand">☝</div></div>
-  <div class="instruction">SENTUH UNTUK MEMULAI</div>
-  <div class="sub">TOUCH TO INITIALIZE EVENT SYSTEM</div>
-</div>
-<div class="center" id="loading">
-  <div class="ring"></div>
-  <div class="instruction">SYSTEM INITIALIZING</div>
-  <div class="percent" id="percent">0%</div>
-  <div class="progressWrap"><div class="progress"><div class="fill" id="fill"></div></div></div>
-  <div class="status" id="status">AI CORE ACTIVATING...</div>
-</div>
-<div class="center" id="ready">
-  <div class="ring"></div>
-  <div class="instruction">KEGIATAN DIMULAI</div>
-  <div class="sub">SYSTEM ONLINE • EVENT INITIALIZED</div>
-</div>
-<div class="scanlines"></div><div class="vignette"></div>
+  <canvas id="particles"></canvas>
+
+  <div class="hud" id="hud">
+    <span class="c2"></span><span class="c3"></span>
+  </div>
+
+  <div class="top">
+    <span>AI EVENT CONTROL / BIOMETRIC INTERFACE</span>
+    <span id="clock">00:00:00</span>
+  </div>
+
+  <div class="bottom">
+    <span id="bottomLeft">PALM INPUT READY</span>
+    <span id="bottomRight">SYSTEM STANDBY</span>
+  </div>
+
+  <!-- STANDBY -->
+  <div class="center" id="standby">
+    <div class="scanner">
+      <div class="ringProgress" id="standbyRing"></div>
+      <div class="readout">PALM SCAN<br>WAITING<br>INPUT AREA</div>
+      <div class="readout right">AI CORE<br>IDLE<br>SECURE</div>
+
+      <div class="palm">
+        <svg viewBox="0 0 200 250" aria-hidden="true">
+          <path d="M100 236 C75 236 50 224 44 201 L39 135 C38 125 44 119 52 119 C59 119 63 124 64 132 L68 169 L62 82 C61 71 68 65 76 65 C84 65 88 71 89 80 L94 157 L90 55 C90 44 97 38 105 39 C113 39 118 46 118 55 L120 157 L121 74 C121 64 128 58 136 59 C144 60 148 67 148 76 L149 160 L151 100 C152 90 159 85 167 87 C175 89 178 96 177 106 L175 179 C173 214 149 236 100 236Z"/>
+          <path class="line" d="M73 183 C83 166 103 160 120 171 C134 180 147 180 161 173"/>
+          <path class="line" d="M68 198 C84 183 103 181 119 191 C135 201 149 198 163 188"/>
+          <path class="line" d="M86 211 C101 202 117 204 132 213"/>
+          <path class="line" d="M96 80 C103 94 105 119 105 150"/>
+          <path class="line" d="M126 83 C132 104 133 132 132 158"/>
+        </svg>
+      </div>
+      <div class="scanBeam"></div>
+    </div>
+    <div class="title">PALM AUTHENTICATION</div>
+    <div class="sub">PLACE PALM ON SCREEN TO INITIALIZE</div>
+    <div class="palmHint">PALM CONTACT DETECTION • READY</div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="center" id="loading">
+    <div class="scanner">
+      <div class="ringProgress" id="loadingRing"></div>
+      <div class="readout">BIOMETRIC<br>SCANNING<br>ACTIVE</div>
+      <div class="readout right">AI CORE<br>PROCESSING<br>SECURE</div>
+      <div class="palm">
+        <svg viewBox="0 0 200 250">
+          <path d="M100 236 C75 236 50 224 44 201 L39 135 C38 125 44 119 52 119 C59 119 63 124 64 132 L68 169 L62 82 C61 71 68 65 76 65 C84 65 88 71 89 80 L94 157 L90 55 C90 44 97 38 105 39 C113 39 118 46 118 55 L120 157 L121 74 C121 64 128 58 136 59 C144 60 148 67 148 76 L149 160 L151 100 C152 90 159 85 167 87 C175 89 178 96 177 106 L175 179 C173 214 149 236 100 236Z"/>
+          <path class="line" d="M73 183 C83 166 103 160 120 171 C134 180 147 180 161 173"/>
+          <path class="line" d="M68 198 C84 183 103 181 119 191 C135 201 149 198 163 188"/>
+          <path class="line" d="M86 211 C101 202 117 204 132 213"/>
+        </svg>
+      </div>
+      <div class="scanBeam"></div>
+    </div>
+    <div class="title">SYSTEM INITIALIZING</div>
+    <div class="progressText" id="percent">0%</div>
+    <div class="status" id="status">AI CORE ACTIVATING...</div>
+  </div>
+
+  <!-- READY -->
+  <div class="center" id="ready">
+    <div class="scanner">
+      <div class="ringProgress" id="readyRing"></div>
+      <div class="readout">AI CORE<br>ONLINE<br>ACTIVE</div>
+      <div class="readout right">SYSTEM READY<br>CONNECTION<br>STABLE</div>
+      <div class="palm">
+        <svg viewBox="0 0 200 250">
+          <path d="M100 236 C75 236 50 224 44 201 L39 135 C38 125 44 119 52 119 C59 119 63 124 64 132 L68 169 L62 82 C61 71 68 65 76 65 C84 65 88 71 89 80 L94 157 L90 55 C90 44 97 38 105 39 C113 39 118 46 118 55 L120 157 L121 74 C121 64 128 58 136 59 C144 60 148 67 148 76 L149 160 L151 100 C152 90 159 85 167 87 C175 89 178 96 177 106 L175 179 C173 214 149 236 100 236Z"/>
+          <path class="line" d="M73 183 C83 166 103 160 120 171 C134 180 147 180 161 173"/>
+          <path class="line" d="M68 198 C84 183 103 181 119 191 C135 201 149 198 163 188"/>
+          <path class="line" d="M86 211 C101 202 117 204 132 213"/>
+        </svg>
+      </div>
+    </div>
+    <div class="progressText">100%</div>
+    <div class="title">KEGIATAN DIBUKA</div>
+    <div class="sub">SYSTEM ONLINE • ALL SYSTEMS OPERATIONAL</div>
+  </div>
+
+  <div class="flash" id="flash"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
 </div>
 
 <script>
-const app=document.getElementById('app'), standby=document.getElementById('standby'),
-loading=document.getElementById('loading'), ready=document.getElementById('ready'),
-percent=document.getElementById('percent'), fill=document.getElementById('fill'),
-status=document.getElementById('status'), clock=document.getElementById('clock');
+/*
+  PALM TOUCH DETECTION
+  --------------------
+  Browser tidak bisa benar-benar mengetahui "telapak tangan" secara universal.
+  Sistem menggunakan ukuran area sentuhan (PointerEvent width/height) sebagai
+  indikator utama. Jika tablet melaporkan ukuran sentuhan kecil, mode fallback
+  memakai durasi sentuhan agar tetap dapat dipakai.
+*/
 
-setInterval(()=>clock.textContent=new Date().toLocaleTimeString('en-GB'),1000);
+const app = document.getElementById('app');
+const standby = document.getElementById('standby');
+const loading = document.getElementById('loading');
+const ready = document.getElementById('ready');
+const percent = document.getElementById('percent');
+const status = document.getElementById('status');
+const fillRing = document.getElementById('loadingRing');
+const standbyRing = document.getElementById('standbyRing');
+const readyRing = document.getElementById('readyRing');
+const flash = document.getElementById('flash');
+
+let started = false;
+let touchStart = null;
+let palmTimer = null;
+
+// Ubah nilai ini jika tablet Anda membaca ukuran telapak lebih kecil/besar.
+const PALM_MIN_SIZE = 42;
+const PALM_HOLD_MS = 180;
 
 function fullscreen(){
   const el=document.documentElement;
   if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
 }
 
+function setRing(el, p, color='blue'){
+  const deg = Math.max(0,Math.min(100,p))*3.6;
+  const c = color==='green' ? 'var(--green)' : 'var(--blue)';
+  const bg = color==='green' ? '#12351f' : 'rgba(4,35,55,.8)';
+  el.style.background=`conic-gradient(${c} ${deg}deg, ${bg} ${deg}deg)`;
+}
+
 function startOpening(){
+  if(started) return;
+  started=true;
   fullscreen();
   standby.style.display='none';
   loading.classList.add('active','fade');
-  const start=performance.now(), duration=2000;
+  document.getElementById('bottomLeft').textContent='BIOMETRIC INPUT ACCEPTED';
+  document.getElementById('bottomRight').textContent='SYSTEM INITIALIZING';
+
+  const start=performance.now();
+  const duration=2000;
+
   function tick(now){
     const p=Math.min((now-start)/duration,1);
-    const value=Math.floor(p*100);
-    percent.textContent=value+'%';
-    fill.style.width=value+'%';
-    if(value<25) status.textContent='AI CORE ACTIVATING...';
-    else if(value<50) status.textContent='LOADING EVENT PROTOCOL...';
-    else if(value<75) status.textContent='SYNCHRONIZING HUD SYSTEM...';
-    else if(value<100) status.textContent='FINALIZING EVENT SEQUENCE...';
+    const v=Math.floor(p*100);
+    percent.textContent=v+'%';
+    setRing(fillRing,v,'blue');
+
+    if(v<25) status.textContent='PALM PATTERN SCANNING...';
+    else if(v<50) status.textContent='AI CORE ACTIVATING...';
+    else if(v<75) status.textContent='SYNCHRONIZING EVENT SYSTEM...';
+    else if(v<100) status.textContent='FINALIZING INITIALIZATION...';
     else status.textContent='SYSTEM READY';
+
     if(p<1) requestAnimationFrame(tick);
-    else setTimeout(()=>{
-      loading.style.display='none';
-      app.classList.add('readyMode');
-      ready.classList.add('active','fade');
-      status.textContent='SYSTEM ONLINE';
-    },120);
+    else setTimeout(finish,180);
   }
   requestAnimationFrame(tick);
 }
 
-document.getElementById('standby').addEventListener('pointerup',startOpening);
-document.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' ')startOpening()},{once:true});
-
-// lightweight HUD particles
-const canvas=document.getElementById('particles'),ctx=canvas.getContext('2d');
-let w,h,pts=[];
-function resize(){w=canvas.width=innerWidth;h=canvas.height=innerHeight;pts=Array.from({length:55},()=>({x:Math.random()*w,y:Math.random()*h,s:Math.random()*1.5+.3,v:Math.random()*.35+.05}))}
-function draw(){
- ctx.clearRect(0,0,w,h); ctx.fillStyle='rgba(65,195,255,.7)';
- pts.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=h;ctx.fillRect(p.x,p.y,p.s,p.s)});
- requestAnimationFrame(draw);
+function finish(){
+  loading.style.display='none';
+  app.classList.add('ready');
+  ready.classList.add('active','fade');
+  setRing(readyRing,100,'green');
+  document.getElementById('bottomLeft').textContent='PALM AUTHENTICATED';
+  document.getElementById('bottomRight').textContent='SYSTEM ONLINE';
+  flash.classList.add('go');
+  setTimeout(()=>flash.classList.remove('go'),700);
 }
-addEventListener('resize',resize);resize();draw();
+
+/* Deteksi area sentuhan */
+function pointerDown(e){
+  if(started || e.pointerType==='mouse') return;
+
+  const width=e.width || 0;
+  const height=e.height || 0;
+  const area=Math.max(width,height);
+  const likelyPalm=area>=PALM_MIN_SIZE;
+
+  touchStart={time:performance.now(), likelyPalm};
+
+  clearTimeout(palmTimer);
+
+  // Jika perangkat benar-benar melaporkan area telapak besar, mulai cepat.
+  if(likelyPalm){
+    palmTimer=setTimeout(startOpening,80);
+  }else{
+    // Fallback: telapak menempel sedikit lebih lama daripada tap satu jari.
+    palmTimer=setTimeout(()=>{
+      if(touchStart && performance.now()-touchStart.time>=PALM_HOLD_MS){
+        startOpening();
+      }
+    },PALM_HOLD_MS);
+  }
+}
+
+function pointerUp(){
+  clearTimeout(palmTimer);
+  touchStart=null;
+}
+
+app.addEventListener('pointerdown',pointerDown,{passive:true});
+app.addEventListener('pointerup',pointerUp,{passive:true});
+app.addEventListener('pointercancel',pointerUp,{passive:true});
+
+/* Keyboard untuk pengujian di PC */
+document.addEventListener('keydown',e=>{
+  if((e.key==='Enter'||e.key===' ')&&!started) startOpening();
+});
+
+/* Jam */
+setInterval(()=>{
+  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-GB');
+},1000);
+
+/* Background particles */
+const canvas=document.getElementById('particles');
+const ctx=canvas.getContext('2d');
+let w,h,pts=[];
+function resize(){
+  w=canvas.width=innerWidth;
+  h=canvas.height=innerHeight;
+  pts=Array.from({length:65},()=>({
+    x:Math.random()*w,y:Math.random()*h,
+    s:Math.random()*1.5+.3,v:Math.random()*.35+.05
+  }));
+}
+function draw(){
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='rgba(55,190,255,.65)';
+  pts.forEach(p=>{
+    p.y-=p.v;
+    if(p.y<0)p.y=h;
+    ctx.fillRect(p.x,p.y,p.s,p.s);
+  });
+  requestAnimationFrame(draw);
+}
+addEventListener('resize',resize);
+resize();draw();
 </script>
 </body>
 </html>
