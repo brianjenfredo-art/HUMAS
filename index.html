@@ -71,7 +71,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
 .header{top:3.5dvh}.footer{bottom:2.7dvh}
 
 .center{
-  position:absolute;z-index:4;left:50%;top:48%;
+  position:absolute;z-index:4;left:50%;top:50%;
   transform:translate(-50%,-50%);
   width:96vw;text-align:center;
 }
@@ -136,12 +136,11 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
 .sub{margin-top:7px;font-size:clamp(7px,1.5vw,11px);letter-spacing:2px;opacity:.62}
 .hint{margin-top:10px;font-size:clamp(7px,1.4vw,10px);letter-spacing:2px;opacity:.42}
 #loading,#ready{display:none}
-#loading.active,#ready.active{display:block}
+#loading.active{display:block}
 .percent{
   margin-top:8px;font-size:clamp(52px,15vw,96px);
   font-weight:900;line-height:1;text-shadow:0 0 28px currentColor;
 }
-.status{margin-top:7px;font-size:clamp(7px,1.5vw,11px);letter-spacing:2.5px;opacity:.72}
 .flash{
   position:absolute;inset:0;background:#54ff7b;opacity:0;
   pointer-events:none;z-index:10;
@@ -228,6 +227,32 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
 }
 #fullscreenHint.show{opacity:.9}
 
+
+/* iOS SAFARI / TOUCH ONLY MODE */
+html, body, #app, #app *{
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+  -webkit-tap-highlight-color:transparent !important;
+  -webkit-user-drag:none !important;
+}
+img{
+  pointer-events:none;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+  -webkit-user-drag:none !important;
+}
+body{
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+#resetButton{
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+}
+
 </style>
 </head>
 
@@ -240,39 +265,14 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
   <div class="frame">
     <span class="c2"></span><span class="c3"></span>
   </div>
-
-  <div class="header">
-    <b>AI EVENT CONTROL / BIOMETRIC INTERFACE</b>
-    <span id="clock">00:00:00</span>
-  </div>
-
-  <div class="footer">
-    <span id="leftInfo">PALM INPUT READY</span>
-    <span id="rightInfo">SYSTEM STANDBY</span>
-  </div>
-
-  <!-- MODE AWAL -->
+<!-- MODE AWAL -->
   <section class="center" id="standby">
 
     <div class="scanner">
 
       <div class="progressRing"></div>
 
-      <div class="readout">
-        AI CORE<br>
-        V2.6.1<br><br>
-        STATUS<br>
-        WAITING
-      </div>
-
-      <div class="readout r">
-        NETWORK<br>
-        CONNECTED<br><br>
-        SECURITY<br>
-        ACTIVE
-      </div>
-
-      <!-- FILE GITHUB: tangan biru.png -->
+<!-- FILE GITHUB: tangan biru.png -->
       <img
         id="blueHand"
         class="handImage"
@@ -283,12 +283,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
 
       <div class="beam"></div>
     </div>
-
-    <div class="title">PALM AUTHENTICATION</div>
-    <div class="sub">PLACE PALM ON SCREEN TO INITIALIZE</div>
-    <div class="hint">BIOMETRIC CONTACT DETECTION • READY</div>
-
-  </section>
+</section>
 
   <!-- MODE LOADING -->
   <section class="center" id="loading">
@@ -297,19 +292,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
 
       <div class="progressRing" id="loadingRing"></div>
 
-      <div class="readout">
-        BIOMETRIC<br>
-        SCANNING<br>
-        ACTIVE
-      </div>
-
-      <div class="readout r">
-        AI CORE<br>
-        PROCESSING<br>
-        SECURE
-      </div>
-
-      <!-- Tetap menggunakan tangan biru selama proses loading -->
+<!-- Tetap menggunakan tangan biru selama proses loading -->
       <img
         class="handImage"
         src="tangan%20biru.png"
@@ -320,12 +303,8 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
       <div class="beam"></div>
 
     </div>
-
-    <div class="title">SYSTEM INITIALIZING</div>
-    <div class="percent" id="percent">0%</div>
-    <div class="status" id="status">PALM PATTERN SCANNING...</div>
-
-  </section>
+<div class="percent" id="percent">0%</div>
+</section>
 
   <!-- MODE SELESAI / HIJAU -->
   <section class="center" id="ready">
@@ -334,21 +313,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
 
       <div class="progressRing" id="readyRing"></div>
 
-      <div class="readout">
-        AI CORE<br>
-        ACTIVE ✓<br><br>
-        STATUS<br>
-        ONLINE ✓
-      </div>
-
-      <div class="readout r">
-        NETWORK<br>
-        STABLE ✓<br><br>
-        DATA LINK<br>
-        SECURE ✓
-      </div>
-
-      <!-- FILE GITHUB: tangan hijau.png -->
+<!-- FILE GITHUB: tangan hijau.png -->
       <img
         class="handImage"
         src="tangan%20hijau.png"
@@ -357,12 +322,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
       >
 
     </div>
-
-    <div class="percent">100%</div>
-    <div class="title">KEGIATAN DIBUKA</div>
-    <div class="sub">SYSTEM ONLINE • ALL SYSTEMS OPERATIONAL</div>
-
-  </section>
+</section>
 
   <div class="flash" id="flash"></div>
   
@@ -372,8 +332,6 @@ canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opac
     <path d="M20 4v7h-7"/>
   </svg>
 </button>
-<div id="fullscreenHint">SENTUH LAYAR UNTUK FULLSCREEN</div>
-
 <div class="scanlines"></div>
   <div class="vignette"></div>
 
@@ -461,10 +419,6 @@ function resetSystem(){
   setRing(readyRing,0);
 
   percent.textContent='0%';
-  status.textContent='PALM PATTERN SCANNING...';
-
-  document.getElementById('leftInfo').textContent='PALM INPUT READY';
-  document.getElementById('rightInfo').textContent='SYSTEM STANDBY';
 
   flash.classList.remove('go');
 
@@ -483,21 +437,13 @@ function finishOpening(){
 
   if(!started) return;
 
-  loading.style.display='none';
-
+  // Tetap menampilkan loading screen dan angka 100%.
+  // Hanya warna sistem yang berubah dari biru menjadi hijau.
   app.classList.add('green');
 
-  ready.classList.add('active','fade');
+  percent.textContent='100%';
+  setRing(ring,100);
 
-  setRing(readyRing,100);
-
-  document.getElementById('leftInfo').textContent =
-    'PALM AUTHENTICATED';
-
-  document.getElementById('rightInfo').textContent =
-    'SYSTEM ONLINE';
-
-  /* Getaran konfirmasi 100% */
   vibrate([100,50,180]);
 
   flash.classList.add('go');
@@ -523,12 +469,6 @@ function startOpening(){
 
   loading.classList.add('active','fade');
 
-  document.getElementById('leftInfo').textContent =
-    'BIOMETRIC INPUT ACCEPTED';
-
-  document.getElementById('rightInfo').textContent =
-    'SYSTEM INITIALIZING';
-
   vibrate(20);
 
   const startTime=performance.now();
@@ -545,28 +485,6 @@ function startOpening(){
     percent.textContent=value+'%';
 
     setRing(ring,value);
-
-    if(value<25){
-
-      status.textContent='PALM PATTERN SCANNING...';
-
-    }else if(value<50){
-
-      status.textContent='AI CORE ACTIVATING...';
-
-    }else if(value<75){
-
-      status.textContent='SYNCHRONIZING EVENT SYSTEM...';
-
-    }else if(value<100){
-
-      status.textContent='FINALIZING INITIALIZATION...';
-
-    }else{
-
-      status.textContent='SYSTEM READY';
-
-    }
 
     if(progress<1){
 
