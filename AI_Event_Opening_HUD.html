@@ -2,246 +2,671 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#01050a">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#01060d">
 <title>AI Palm Event Opening</title>
 <style>
 :root{
- --blue:#19bfff; --blue2:#008cff; --green:#51ff78; --bg:#01050a;
- --vh:100dvh;
+  --blue:#16bfff;
+  --green:#4dff78;
+  --bg:#01060d;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01050a}
-body{font-family:Arial,Helvetica,sans-serif;color:var(--blue);touch-action:none;overscroll-behavior:none}
-button{font:inherit;color:inherit}
-#app{position:relative;width:100%;height:100dvh;min-height:100%;overflow:hidden;background:
- radial-gradient(circle at 50% 42%,rgba(0,140,255,.18),transparent 34%),
- linear-gradient(180deg,#01050a 0%,#02101b 52%,#01060c 100%);transition:background 900ms ease,color 900ms ease}
-#app.green{color:var(--green);background:
- radial-gradient(circle at 50% 48%,rgba(40,255,105,.18),transparent 36%),
- linear-gradient(180deg,#010904 0%,#03170a 55%,#010603 100%)}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  touch-action:none;
+  overscroll-behavior:none;
+}
+#app{
+  position:relative;width:100%;height:100dvh;overflow:hidden;
+  color:var(--blue);
+  background:
+    radial-gradient(circle at 50% 45%,rgba(0,145,255,.18),transparent 38%),
+    linear-gradient(180deg,#01050b,#03121e 55%,#01060c);
+  transition:color .55s ease,background .55s ease;
+}
+#app.green{
+  color:var(--green);
+  background:
+    radial-gradient(circle at 50% 45%,rgba(40,255,100,.18),transparent 40%),
+    linear-gradient(180deg,#010804,#03170a 55%,#010604);
+}
+
 canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.7}
-.grid{position:absolute;inset:0;pointer-events:none;opacity:.23;background:
- linear-gradient(rgba(35,190,255,.16) 1px,transparent 1px),
- linear-gradient(90deg,rgba(35,190,255,.16) 1px,transparent 1px);
- background-size:38px 38px;mask-image:linear-gradient(to bottom,transparent,black 15%,black 85%,transparent)}
-.scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.025) 0 1px,transparent 1px 5px)}
-.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,transparent 40%,rgba(0,0,0,.75) 100%)}
+.grid{
+  position:absolute;inset:0;pointer-events:none;opacity:.18;
+  background:
+    linear-gradient(rgba(30,190,255,.18) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(30,190,255,.18) 1px,transparent 1px);
+  background-size:38px 38px;
+}
+.scanlines{
+  position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(to bottom,rgba(255,255,255,.025) 0 1px,transparent 1px 5px);
+}
+.vignette{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle,transparent 42%,rgba(0,0,0,.76) 100%);
+}
+.frame{
+  position:absolute;inset:2dvh 2.5vw;border:1px solid color-mix(in srgb,currentColor 28%,transparent);
+  pointer-events:none;
+}
+.frame:before,.frame:after,.c2,.c3{
+  content:"";position:absolute;width:clamp(35px,8vw,75px);height:clamp(35px,8vw,75px);
+  border:2px solid currentColor;opacity:.85;
+}
+.frame:before{left:-1px;top:-1px;border-right:0;border-bottom:0}
+.frame:after{right:-1px;bottom:-1px;border-left:0;border-top:0}
+.c2{right:-1px;top:-1px;border-left:0;border-bottom:0}
+.c3{left:-1px;bottom:-1px;border-right:0;border-top:0}
 
-.frame{position:absolute;inset:2.2dvh 2.8vw;border:1px solid color-mix(in srgb,currentColor 25%,transparent);pointer-events:none}
-.frame:before,.frame:after,.c2,.c3{content:"";position:absolute;width:clamp(34px,7vw,75px);height:clamp(34px,7vw,75px);border:2px solid currentColor;opacity:.8}
-.frame:before{top:-1px;left:-1px;border-right:0;border-bottom:0}
-.frame:after{bottom:-1px;right:-1px;border-left:0;border-top:0}
-.c2{right:-1px;top:-1px;border-left:0;border-bottom:0}.c3{left:-1px;bottom:-1px;border-right:0;border-top:0}
+.header,.footer{
+  position:absolute;z-index:5;left:6vw;right:6vw;
+  display:flex;justify-content:space-between;gap:12px;
+  text-transform:uppercase;letter-spacing:clamp(1px,.5vw,4px);
+  font-size:clamp(7px,1.5vw,11px);opacity:.78;
+}
+.header{top:3.5dvh}.footer{bottom:2.7dvh}
 
-.header,.footer{position:absolute;z-index:5;left:7vw;right:7vw;display:flex;justify-content:space-between;gap:10px;text-transform:uppercase;letter-spacing:clamp(1px,.45vw,4px);font-size:clamp(7px,1.5vw,11px);opacity:.8}
-.header{top:4dvh}.footer{bottom:3dvh}
-.header b,.footer b{font-weight:700}
-.center{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,650px);text-align:center}
-.scanner{position:relative;width:min(72vw,420px);height:min(72vw,420px);margin:auto;border:1px solid currentColor;border-radius:50%;box-shadow:0 0 40px color-mix(in srgb,currentColor 20%,transparent),inset 0 0 55px color-mix(in srgb,currentColor 10%,transparent)}
-.scanner:before{content:"";position:absolute;inset:5%;border:1px dashed currentColor;border-radius:50%;opacity:.65;animation:spin 12s linear infinite}
-.scanner:after{content:"";position:absolute;inset:14%;border:1px solid currentColor;border-radius:50%;opacity:.25;animation:spinR 8s linear infinite}
-.progressRing{position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(currentColor 0deg,transparent 0deg);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 11px),#000 calc(100% - 10px));mask:radial-gradient(farthest-side,transparent calc(100% - 11px),#000 calc(100% - 10px));z-index:3}
-.palm{position:absolute;z-index:2;left:50%;top:50%;width:70%;height:82%;transform:translate(-50%,-49%);filter:drop-shadow(0 0 12px currentColor)}
-.palm svg{width:100%;height:100%;overflow:visible}
-.palmBase{fill:color-mix(in srgb,currentColor 5%,transparent);stroke:currentColor;stroke-width:1.8}
-.fp{fill:none;stroke:currentColor;stroke-width:1;opacity:.9}
-.fp2{fill:none;stroke:currentColor;stroke-width:.7;opacity:.55}
-.beam{position:absolute;z-index:4;left:10%;right:10%;top:50%;height:2px;background:currentColor;box-shadow:0 0 18px 6px color-mix(in srgb,currentColor 45%,transparent);animation:beam 2.2s ease-in-out infinite}
-.readout{position:absolute;z-index:5;top:18%;left:7%;font-size:clamp(6px,1.4vw,10px);line-height:1.65;text-align:left;letter-spacing:1.5px}
-.readout.r{left:auto;right:7%;text-align:right}
-.title{margin-top:clamp(12px,2.8dvh,25px);font-size:clamp(16px,4vw,28px);font-weight:800;letter-spacing:clamp(2px,1vw,6px);text-shadow:0 0 18px currentColor}
-.sub{margin-top:8px;font-size:clamp(7px,1.6vw,11px);letter-spacing:clamp(1px,.6vw,3px);opacity:.65}
-.hint{margin-top:12px;font-size:clamp(7px,1.4vw,10px);letter-spacing:2px;opacity:.45}
+.center{
+  position:absolute;z-index:4;left:50%;top:48%;
+  transform:translate(-50%,-50%);
+  width:96vw;text-align:center;
+}
+.scanner{
+  position:relative;
+  width:min(94vw,600px);
+  height:min(94vw,600px);
+  margin:auto;
+  border:1px solid currentColor;
+  border-radius:50%;
+  box-shadow:
+    0 0 55px color-mix(in srgb,currentColor 20%,transparent),
+    inset 0 0 70px color-mix(in srgb,currentColor 10%,transparent);
+}
+.scanner:before{
+  content:"";position:absolute;inset:4%;
+  border:1px dashed currentColor;border-radius:50%;opacity:.6;
+  animation:spin 12s linear infinite;
+}
+.scanner:after{
+  content:"";position:absolute;inset:11%;
+  border:1px solid currentColor;border-radius:50%;opacity:.25;
+  animation:spinR 8s linear infinite;
+}
+.progressRing{
+  position:absolute;inset:-4px;border-radius:50%;z-index:3;
+  background:conic-gradient(currentColor 0deg,rgba(0,25,40,.7) 0deg);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 13px),#000 calc(100% - 12px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 13px),#000 calc(100% - 12px));
+}
+.handImage{
+  position:absolute;
+  z-index:2;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%);
+  width:88%;
+  height:88%;
+  object-fit:contain;
+  object-position:center;
+  user-select:none;
+  -webkit-user-drag:none;
+  filter:drop-shadow(0 0 18px color-mix(in srgb,currentColor 75%,transparent));
+}
+.beam{
+  position:absolute;z-index:4;left:9%;right:9%;top:50%;height:2px;
+  background:currentColor;
+  box-shadow:0 0 20px 7px color-mix(in srgb,currentColor 45%,transparent);
+  animation:beam 1.9s ease-in-out infinite;
+}
+.readout{
+  position:absolute;z-index:5;top:15%;left:6%;
+  font-size:clamp(6px,1.4vw,10px);line-height:1.7;
+  letter-spacing:1.5px;text-align:left;
+}
+.readout.r{left:auto;right:6%;text-align:right}
+.title{
+  margin-top:clamp(10px,2dvh,22px);
+  font-size:clamp(16px,4vw,28px);
+  font-weight:800;letter-spacing:clamp(2px,1vw,6px);
+  text-shadow:0 0 18px currentColor;
+}
+.sub{margin-top:7px;font-size:clamp(7px,1.5vw,11px);letter-spacing:2px;opacity:.62}
+.hint{margin-top:10px;font-size:clamp(7px,1.4vw,10px);letter-spacing:2px;opacity:.42}
 #loading,#ready{display:none}
 #loading.active,#ready.active{display:block}
-.percent{margin-top:8px;font-size:clamp(50px,14vw,88px);font-weight:900;line-height:1;text-shadow:0 0 28px currentColor}
+.percent{
+  margin-top:8px;font-size:clamp(52px,15vw,96px);
+  font-weight:900;line-height:1;text-shadow:0 0 28px currentColor;
+}
 .status{margin-top:7px;font-size:clamp(7px,1.5vw,11px);letter-spacing:2.5px;opacity:.72}
-.readyFlash{position:absolute;inset:0;background:#57ff7d;opacity:0;z-index:10;pointer-events:none}
-.readyFlash.go{animation:flash .65s ease-out}
-.shake{animation:deviceShake .34s linear 1}
-.fade{animation:fade .45s ease}
-@keyframes spin{to{transform:rotate(360deg)}}@keyframes spinR{to{transform:rotate(-360deg)}}
-@keyframes beam{0%,100%{transform:translateY(-135px);opacity:.1}50%{transform:translateY(135px);opacity:1}}
-@keyframes fade{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
-@keyframes flash{0%{opacity:0}20%{opacity:.28}100%{opacity:0}}
-@keyframes deviceShake{0%{transform:translate(0,0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,2px)}100%{transform:translate(0,0)}}
+.flash{
+  position:absolute;inset:0;background:#54ff7b;opacity:0;
+  pointer-events:none;z-index:10;
+}
+.flash.go{animation:flash .55s ease-out}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes spinR{to{transform:rotate(-360deg)}}
+@keyframes beam{
+  0%,100%{transform:translateY(-145px);opacity:.08}
+  50%{transform:translateY(145px);opacity:1}
+}
+@keyframes flash{
+  0%{opacity:0}20%{opacity:.32}100%{opacity:0}
+}
+@keyframes fade{
+  from{opacity:0;transform:translate(-50%,-47%)}
+  to{opacity:1;transform:translate(-50%,-50%)}
+}
+.fade{animation:fade .4s ease}
 
 @media (orientation:portrait){
- .center{top:48%;width:94vw}
- .scanner{width:min(82vw,390px);height:min(82vw,390px)}
- .palm{width:74%;height:84%}
- .header{top:3dvh}.footer{bottom:2.5dvh}
+  .scanner{width:min(94vw,600px);height:min(94vw,600px)}
+  .handImage{width:91%;height:91%}
 }
 @media (max-width:500px) and (orientation:portrait){
- .frame{inset:1.5dvh 2vw}.header,.footer{left:6vw;right:6vw;font-size:7px}
- .scanner{width:min(84vw,330px);height:min(84vw,330px)}
- .readout{font-size:6px}.title{font-size:17px;letter-spacing:2px}.sub{font-size:8px}
+  .frame{inset:1.5dvh 2vw}
+  .header,.footer{left:5vw;right:5vw;font-size:6.5px}
+  .scanner{width:92vw;height:92vw}
+  .handImage{width:92%;height:92%}
+  .readout{font-size:6px}
+  .title{font-size:16px;letter-spacing:2px}
+  .sub{font-size:7px}
 }
 @media (orientation:landscape){
- .center{top:50%;width:min(86vw,700px)}
- .scanner{width:min(58vh,420px);height:min(58vh,420px)}
+  .scanner{width:min(78vh,600px);height:min(78vh,600px)}
 }
-@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style>
 </head>
+
 <body>
 <div id="app">
- <canvas id="particles"></canvas>
- <div class="grid"></div>
- <div class="frame"><span class="c2"></span><span class="c3"></span></div>
 
- <div class="header">
-  <b>AI EVENT CONTROL / BIOMETRIC INTERFACE</b><span id="clock">00:00:00</span>
- </div>
- <div class="footer">
-  <span id="leftInfo">PALM INPUT READY</span><span id="rightInfo">SYSTEM STANDBY</span>
- </div>
+  <canvas id="particles"></canvas>
+  <div class="grid"></div>
 
- <section class="center" id="standby">
-  <div class="scanner">
-   <div class="progressRing"></div>
-   <div class="readout">AI CORE<br>V2.6.1<br><br>STATUS<br>WAITING</div>
-   <div class="readout r">NETWORK<br>CONNECTED<br><br>SECURITY<br>ACTIVE</div>
-   <div class="palm"><svg viewBox="0 0 200 250">
-    <path class="palmBase" d="M100 238C73 238 49 225 43 200L38 135C37 125 43 118 51 118C59 118 63 124 64 132L68 168L62 82C61 71 68 64 76 64C84 64 89 71 89 80L94 156L90 55C90 44 97 38 105 39C113 40 118 46 118 55L120 157L121 74C121 64 128 58 136 59C144 60 148 67 148 76L149 160L151 100C152 90 159 85 167 87C175 89 178 96 177 106L175 179C173 215 149 238 100 238Z"/>
-    <g id="fingerprint">
-      <path class="fp" d="M67 180C76 155 103 145 123 160C141 174 150 177 165 168"/>
-      <path class="fp" d="M65 192C80 169 104 164 124 176C139 185 151 186 167 178"/>
-      <path class="fp" d="M68 204C83 183 105 181 123 191C138 200 149 198 162 190"/>
-      <path class="fp" d="M78 216C91 201 108 199 124 207C136 213 146 211 156 203"/>
-      <path class="fp2" d="M84 224C97 214 110 214 122 219C131 223 140 222 148 216"/>
-      <path class="fp2" d="M82 167C88 149 105 138 121 142"/>
-      <path class="fp2" d="M94 82C101 105 103 129 103 154"/>
-      <path class="fp2" d="M127 83C132 104 133 132 132 157"/>
-      <path class="fp2" d="M153 108C155 129 153 149 151 162"/>
-      <path class="fp2" d="M72 92C76 116 78 141 78 163"/>
-    </g>
-   </svg></div>
-   <div class="beam"></div>
+  <div class="frame">
+    <span class="c2"></span><span class="c3"></span>
   </div>
-  <div class="title">PALM AUTHENTICATION</div>
-  <div class="sub">PLACE PALM ON SCREEN TO INITIALIZE</div>
-  <div class="hint">BIOMETRIC CONTACT DETECTION • READY</div>
- </section>
 
- <section class="center" id="loading">
-  <div class="scanner">
-   <div class="progressRing" id="loadingRing"></div>
-   <div class="readout">BIOMETRIC<br>SCANNING<br>ACTIVE</div>
-   <div class="readout r">AI CORE<br>PROCESSING<br>SECURE</div>
-   <div class="palm"><svg viewBox="0 0 200 250">
-    <path class="palmBase" d="M100 238C73 238 49 225 43 200L38 135C37 125 43 118 51 118C59 118 63 124 64 132L68 168L62 82C61 71 68 64 76 64C84 64 89 71 89 80L94 156L90 55C90 44 97 38 105 39C113 40 118 46 118 55L120 157L121 74C121 64 128 58 136 59C144 60 148 67 148 76L149 160L151 100C152 90 159 85 167 87C175 89 178 96 177 106L175 179C173 215 149 238 100 238Z"/>
-    <g class="fingerprint">
-      <path class="fp" d="M67 180C76 155 103 145 123 160C141 174 150 177 165 168"/><path class="fp" d="M65 192C80 169 104 164 124 176C139 185 151 186 167 178"/><path class="fp" d="M68 204C83 183 105 181 123 191C138 200 149 198 162 190"/><path class="fp" d="M78 216C91 201 108 199 124 207C136 213 146 211 156 203"/><path class="fp2" d="M84 224C97 214 110 214 122 219C131 223 140 222 148 216"/>
-    </g>
-   </svg></div>
-   <div class="beam"></div>
+  <div class="header">
+    <b>AI EVENT CONTROL / BIOMETRIC INTERFACE</b>
+    <span id="clock">00:00:00</span>
   </div>
-  <div class="title">SYSTEM INITIALIZING</div>
-  <div class="percent" id="percent">0%</div>
-  <div class="status" id="status">PALM PATTERN SCANNING...</div>
- </section>
 
- <section class="center" id="ready">
-  <div class="scanner">
-   <div class="progressRing" id="readyRing"></div>
-   <div class="readout">AI CORE<br>ACTIVE ✓<br><br>STATUS<br>ONLINE ✓</div>
-   <div class="readout r">NETWORK<br>STABLE ✓<br><br>DATA LINK<br>SECURE ✓</div>
-   <div class="palm"><svg viewBox="0 0 200 250">
-    <path class="palmBase" d="M100 238C73 238 49 225 43 200L38 135C37 125 43 118 51 118C59 118 63 124 64 132L68 168L62 82C61 71 68 64 76 64C84 64 89 71 89 80L94 156L90 55C90 44 97 38 105 39C113 40 118 46 118 55L120 157L121 74C121 64 128 58 136 59C144 60 148 67 148 76L149 160L151 100C152 90 159 85 167 87C175 89 178 96 177 106L175 179C173 215 149 238 100 238Z"/>
-    <g class="fingerprint"><path class="fp" d="M67 180C76 155 103 145 123 160C141 174 150 177 165 168"/><path class="fp" d="M65 192C80 169 104 164 124 176C139 185 151 186 167 178"/><path class="fp" d="M68 204C83 183 105 181 123 191C138 200 149 198 162 190"/><path class="fp" d="M78 216C91 201 108 199 124 207C136 213 146 211 156 203"/></g>
-    </svg></div>
+  <div class="footer">
+    <span id="leftInfo">PALM INPUT READY</span>
+    <span id="rightInfo">SYSTEM STANDBY</span>
   </div>
-  <div class="percent">100%</div>
-  <div class="title">KEGIATAN DIBUKA</div>
-  <div class="sub">SYSTEM ONLINE • ALL SYSTEMS OPERATIONAL</div>
- </section>
 
- <div class="readyFlash" id="flash"></div>
- <div class="scanlines"></div><div class="vignette"></div>
+  <!-- MODE AWAL -->
+  <section class="center" id="standby">
+
+    <div class="scanner">
+
+      <div class="progressRing"></div>
+
+      <div class="readout">
+        AI CORE<br>
+        V2.6.1<br><br>
+        STATUS<br>
+        WAITING
+      </div>
+
+      <div class="readout r">
+        NETWORK<br>
+        CONNECTED<br><br>
+        SECURITY<br>
+        ACTIVE
+      </div>
+
+      <!-- FILE GITHUB: tangan biru.png -->
+      <img
+        id="blueHand"
+        class="handImage"
+        src="tangan%20biru.png"
+        alt="Palm biometric blue"
+        draggable="false"
+      >
+
+      <div class="beam"></div>
+    </div>
+
+    <div class="title">PALM AUTHENTICATION</div>
+    <div class="sub">PLACE PALM ON SCREEN TO INITIALIZE</div>
+    <div class="hint">BIOMETRIC CONTACT DETECTION • READY</div>
+
+  </section>
+
+  <!-- MODE LOADING -->
+  <section class="center" id="loading">
+
+    <div class="scanner">
+
+      <div class="progressRing" id="loadingRing"></div>
+
+      <div class="readout">
+        BIOMETRIC<br>
+        SCANNING<br>
+        ACTIVE
+      </div>
+
+      <div class="readout r">
+        AI CORE<br>
+        PROCESSING<br>
+        SECURE
+      </div>
+
+      <!-- Tetap menggunakan tangan biru selama proses loading -->
+      <img
+        class="handImage"
+        src="tangan%20biru.png"
+        alt="Palm biometric scanning"
+        draggable="false"
+      >
+
+      <div class="beam"></div>
+
+    </div>
+
+    <div class="title">SYSTEM INITIALIZING</div>
+    <div class="percent" id="percent">0%</div>
+    <div class="status" id="status">PALM PATTERN SCANNING...</div>
+
+  </section>
+
+  <!-- MODE SELESAI / HIJAU -->
+  <section class="center" id="ready">
+
+    <div class="scanner">
+
+      <div class="progressRing" id="readyRing"></div>
+
+      <div class="readout">
+        AI CORE<br>
+        ACTIVE ✓<br><br>
+        STATUS<br>
+        ONLINE ✓
+      </div>
+
+      <div class="readout r">
+        NETWORK<br>
+        STABLE ✓<br><br>
+        DATA LINK<br>
+        SECURE ✓
+      </div>
+
+      <!-- FILE GITHUB: tangan hijau.png -->
+      <img
+        class="handImage"
+        src="tangan%20hijau.png"
+        alt="Palm biometric ready"
+        draggable="false"
+      >
+
+    </div>
+
+    <div class="percent">100%</div>
+    <div class="title">KEGIATAN DIBUKA</div>
+    <div class="sub">SYSTEM ONLINE • ALL SYSTEMS OPERATIONAL</div>
+
+  </section>
+
+  <div class="flash" id="flash"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
 </div>
 
 <script>
-const app=document.getElementById('app'), standby=document.getElementById('standby');
-const loading=document.getElementById('loading'), ready=document.getElementById('ready');
-const ring=document.getElementById('loadingRing'), readyRing=document.getElementById('readyRing');
-const percent=document.getElementById('percent'), status=document.getElementById('status');
-const flash=document.getElementById('flash');
-let started=false, touchStart=0, palmTimer=null;
+const app = document.getElementById('app');
+const standby = document.getElementById('standby');
+const loading = document.getElementById('loading');
+const ready = document.getElementById('ready');
 
-function fullscreen(){
- const el=document.documentElement;
- if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
-}
-function vibrate(pattern){
- if('vibrate' in navigator){
-   try{ navigator.vibrate(pattern); }catch(e){}
- }
-}
-function setRing(el,p){
- const deg=Math.max(0,Math.min(100,p))*3.6;
- el.style.background=`conic-gradient(currentColor ${deg}deg, rgba(0,20,32,.75) ${deg}deg)`;
-}
-function finish(){
- loading.style.display='none';
- app.classList.add('green');
- ready.classList.add('active','fade');
- setRing(readyRing,100);
- document.getElementById('leftInfo').textContent='PALM AUTHENTICATED';
- document.getElementById('rightInfo').textContent='SYSTEM ONLINE';
- flash.classList.add('go');
- // Getaran saat 100%. Pola pendek-ganda agar terasa sebagai konfirmasi.
- vibrate([90,45,130,45,180]);
- setTimeout(()=>flash.classList.remove('go'),700);
-}
-function startOpening(){
- if(started)return;
- started=true; fullscreen(); vibrate(25);
- standby.style.display='none';
- loading.classList.add('active','fade');
- document.getElementById('leftInfo').textContent='BIOMETRIC INPUT ACCEPTED';
- document.getElementById('rightInfo').textContent='SYSTEM INITIALIZING';
- const t0=performance.now(), duration=2000;
- function tick(t){
-   const p=Math.min((t-t0)/duration,1), v=Math.floor(p*100);
-   percent.textContent=v+'%'; setRing(ring,v);
-   if(v<20)status.textContent='PALM PATTERN SCANNING...';
-   else if(v<45)status.textContent='AI CORE ACTIVATING...';
-   else if(v<70)status.textContent='SYNCHRONIZING EVENT SYSTEM...';
-   else if(v<100)status.textContent='FINALIZING INITIALIZATION...';
-   else status.textContent='SYSTEM READY';
-   if(p<1)requestAnimationFrame(tick); else setTimeout(finish,100);
- }
- requestAnimationFrame(tick);
-}
+const ring = document.getElementById('loadingRing');
+const readyRing = document.getElementById('readyRing');
+
+const percent = document.getElementById('percent');
+const status = document.getElementById('status');
+const flash = document.getElementById('flash');
+
+let started = false;
+let touchStart = 0;
+let palmTimer = null;
+
 /*
-  Palm-first touch detection:
-  1) Jika browser memberikan width/height area sentuh besar, dianggap palm.
-  2) Jika browser tidak memberikan area, gunakan hold singkat 180 ms sebagai fallback.
-  Ini tidak membaca biometrik telapak secara literal; browser tidak memberi akses
-  ke bentuk telapak tanpa sensor/AI khusus.
+  DURASI OPENING:
+  1 detik = 1000 ms
 */
-function down(e){
- if(started || e.pointerType==='mouse')return;
- clearTimeout(palmTimer);
- const size=Math.max(e.width||0,e.height||0);
- const likelyPalm=size>=42;
- touchStart=performance.now();
- palmTimer=setTimeout(()=>{ if(likelyPalm || performance.now()-touchStart>=180)startOpening(); },likelyPalm?70:180);
-}
-function up(){clearTimeout(palmTimer);touchStart=0}
-app.addEventListener('pointerdown',down,{passive:true});
-app.addEventListener('pointerup',up,{passive:true});
-app.addEventListener('pointercancel',up,{passive:true});
-document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!started)startOpening()});
-setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-GB'),1000);
+const LOADING_DURATION = 1000;
 
-// Background particles
-const c=document.getElementById('particles'),ctx=c.getContext('2d');let W,H,pts=[];
-function resize(){W=c.width=innerWidth;H=c.height=innerHeight;pts=Array.from({length:65},()=>({x:Math.random()*W,y:Math.random()*H,s:Math.random()*1.4+.3,v:Math.random()*.35+.04}))}
-function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle=getComputedStyle(app).color;pts.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=H;ctx.fillRect(p.x,p.y,p.s,p.s)});requestAnimationFrame(draw)}
-addEventListener('resize',resize);resize();draw();
+
+/* =========================
+   FULLSCREEN
+========================= */
+function fullscreen(){
+  const el = document.documentElement;
+
+  if(document.fullscreenElement) return;
+
+  if(el.requestFullscreen){
+    el.requestFullscreen().catch(()=>{});
+  }
+}
+
+
+/* =========================
+   GETAR
+========================= */
+function vibrate(pattern){
+  if('vibrate' in navigator){
+    try{
+      navigator.vibrate(pattern);
+    }catch(e){}
+  }
+}
+
+
+/* =========================
+   RING PROGRESS
+========================= */
+function setRing(el, value){
+
+  const degree = Math.max(0, Math.min(100,value)) * 3.6;
+
+  el.style.background =
+    `conic-gradient(currentColor ${degree}deg,
+                    rgba(0,25,40,.75) ${degree}deg)`;
+}
+
+
+/* =========================
+   SELESAI
+========================= */
+function finishOpening(){
+
+  loading.style.display = 'none';
+
+  app.classList.add('green');
+
+  ready.classList.add('active','fade');
+
+  setRing(readyRing,100);
+
+  document.getElementById('leftInfo').textContent =
+    'PALM AUTHENTICATED';
+
+  document.getElementById('rightInfo').textContent =
+    'SYSTEM ONLINE';
+
+  /*
+    GETARAN SAAT 100%
+
+    Pola:
+    getar - jeda - getar panjang
+  */
+  vibrate([100,50,180]);
+
+  flash.classList.add('go');
+
+  setTimeout(()=>{
+    flash.classList.remove('go');
+  },600);
+}
+
+
+/* =========================
+   MULAI
+========================= */
+function startOpening(){
+
+  if(started) return;
+
+  started = true;
+
+  fullscreen();
+
+  // Getaran kecil ketika sistem mulai menerima telapak
+  vibrate(25);
+
+  standby.style.display = 'none';
+
+  loading.classList.add('active','fade');
+
+  document.getElementById('leftInfo').textContent =
+    'BIOMETRIC INPUT ACCEPTED';
+
+  document.getElementById('rightInfo').textContent =
+    'SYSTEM INITIALIZING';
+
+  const startTime = performance.now();
+
+  function animate(now){
+
+    const progress =
+      Math.min((now - startTime) / LOADING_DURATION, 1);
+
+    const value = Math.floor(progress * 100);
+
+    percent.textContent = value + '%';
+
+    setRing(ring,value);
+
+    if(value < 25){
+
+      status.textContent =
+        'PALM PATTERN SCANNING...';
+
+    }else if(value < 50){
+
+      status.textContent =
+        'AI CORE ACTIVATING...';
+
+    }else if(value < 75){
+
+      status.textContent =
+        'SYNCHRONIZING EVENT SYSTEM...';
+
+    }else if(value < 100){
+
+      status.textContent =
+        'FINALIZING INITIALIZATION...';
+
+    }else{
+
+      status.textContent =
+        'SYSTEM READY';
+
+    }
+
+    if(progress < 1){
+
+      requestAnimationFrame(animate);
+
+    }else{
+
+      setTimeout(finishOpening,80);
+
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+
+/* =========================
+   DETEKSI TELAPAK
+=========================
+
+Browser tidak memberikan bentuk biometrik telapak
+secara langsung.
+
+Jika tablet memberikan ukuran area sentuh besar,
+sistem menganggapnya sebagai palm contact.
+
+Jika tidak, digunakan fallback hold 180ms.
+*/
+function pointerDown(e){
+
+  if(started || e.pointerType === 'mouse') return;
+
+  clearTimeout(palmTimer);
+
+  const size =
+    Math.max(e.width || 0, e.height || 0);
+
+  const likelyPalm = size >= 42;
+
+  touchStart = performance.now();
+
+  palmTimer = setTimeout(()=>{
+
+    if(
+      likelyPalm ||
+      performance.now() - touchStart >= 180
+    ){
+
+      startOpening();
+
+    }
+
+  }, likelyPalm ? 60 : 180);
+}
+
+
+function pointerUp(){
+
+  clearTimeout(palmTimer);
+
+  touchStart = 0;
+}
+
+
+app.addEventListener(
+  'pointerdown',
+  pointerDown,
+  {passive:true}
+);
+
+app.addEventListener(
+  'pointerup',
+  pointerUp,
+  {passive:true}
+);
+
+app.addEventListener(
+  'pointercancel',
+  pointerUp,
+  {passive:true}
+);
+
+
+/* =========================
+   KEYBOARD TEST
+========================= */
+document.addEventListener('keydown',(e)=>{
+
+  if(
+    (e.key === 'Enter' || e.key === ' ') &&
+    !started
+  ){
+
+    startOpening();
+
+  }
+
+});
+
+
+/* =========================
+   CLOCK
+========================= */
+setInterval(()=>{
+
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('en-GB');
+
+},1000);
+
+
+/* =========================
+   PARTICLES
+========================= */
+const canvas =
+  document.getElementById('particles');
+
+const ctx = canvas.getContext('2d');
+
+let W,H,particles=[];
+
+function resize(){
+
+  W = canvas.width = innerWidth;
+  H = canvas.height = innerHeight;
+
+  particles =
+    Array.from({length:65},()=>({
+
+      x:Math.random()*W,
+      y:Math.random()*H,
+      s:Math.random()*1.5+.3,
+      v:Math.random()*.35+.04
+
+    }));
+
+}
+
+function draw(){
+
+  ctx.clearRect(0,0,W,H);
+
+  ctx.fillStyle =
+    getComputedStyle(app).color;
+
+  particles.forEach(p=>{
+
+    p.y -= p.v;
+
+    if(p.y < 0)
+      p.y = H;
+
+    ctx.fillRect(
+      p.x,
+      p.y,
+      p.s,
+      p.s
+    );
+
+  });
+
+  requestAnimationFrame(draw);
+
+}
+
+addEventListener('resize',resize);
+
+resize();
+draw();
+
+
+/* =========================
+   PRELOAD IMAGE GITHUB
+========================= */
+const blueHand =
+  new Image();
+
+blueHand.src =
+  'tangan%20biru.png';
+
+const greenHand =
+  new Image();
+
+greenHand.src =
+  'tangan%20hijau.png';
 </script>
+
 </body>
 </html>
