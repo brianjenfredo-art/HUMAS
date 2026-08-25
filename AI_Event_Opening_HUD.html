@@ -2,352 +2,246 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#020a14">
-<title>AI Palm Touch Event System</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#01050a">
+<title>AI Palm Event Opening</title>
 <style>
 :root{
-  --blue:#20bfff;
-  --blue2:#0878ff;
-  --green:#42ff87;
-  --bg:#020811;
-  --panel:rgba(3,18,32,.76);
+ --blue:#19bfff; --blue2:#008cff; --green:#51ff78; --bg:#01050a;
+ --vh:100dvh;
 }
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:Arial,Helvetica,sans-serif}
-body{touch-action:none;color:var(--blue)}
-#app{position:relative;width:100vw;height:100vh;overflow:hidden;background:
- radial-gradient(circle at 50% 48%,rgba(0,135,220,.16),transparent 38%),
- radial-gradient(circle at 50% 100%,rgba(0,70,130,.16),transparent 55%),
- linear-gradient(145deg,#01060c,#031321 55%,#01050a)}
-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.scanlines,.vignette{position:absolute;inset:0;pointer-events:none}
-.scanlines{background:repeating-linear-gradient(to bottom,rgba(255,255,255,.025) 0 1px,transparent 1px 5px)}
-.vignette{background:radial-gradient(circle,transparent 45%,rgba(0,0,0,.72) 100%)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#01050a}
+body{font-family:Arial,Helvetica,sans-serif;color:var(--blue);touch-action:none;overscroll-behavior:none}
+button{font:inherit;color:inherit}
+#app{position:relative;width:100%;height:100dvh;min-height:100%;overflow:hidden;background:
+ radial-gradient(circle at 50% 42%,rgba(0,140,255,.18),transparent 34%),
+ linear-gradient(180deg,#01050a 0%,#02101b 52%,#01060c 100%);transition:background 900ms ease,color 900ms ease}
+#app.green{color:var(--green);background:
+ radial-gradient(circle at 50% 48%,rgba(40,255,105,.18),transparent 36%),
+ linear-gradient(180deg,#010904 0%,#03170a 55%,#010603 100%)}
+canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.7}
+.grid{position:absolute;inset:0;pointer-events:none;opacity:.23;background:
+ linear-gradient(rgba(35,190,255,.16) 1px,transparent 1px),
+ linear-gradient(90deg,rgba(35,190,255,.16) 1px,transparent 1px);
+ background-size:38px 38px;mask-image:linear-gradient(to bottom,transparent,black 15%,black 85%,transparent)}
+.scanlines{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(255,255,255,.025) 0 1px,transparent 1px 5px)}
+.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle,transparent 40%,rgba(0,0,0,.75) 100%)}
 
-.hud{
- position:absolute;inset:3vh 3vw;border:1px solid rgba(32,191,255,.25);
- pointer-events:none;transition:.8s;
-}
-.hud:before,.hud:after,.c2,.c3{
- content:"";position:absolute;width:62px;height:62px;border-color:var(--blue);border-style:solid;transition:.8s
-}
-.hud:before{left:-1px;top:-1px;border-width:2px 0 0 2px}
-.hud:after{right:-1px;bottom:-1px;border-width:0 2px 2px 0}
-.c2{right:-1px;top:-1px;border-width:2px 2px 0 0}
-.c3{left:-1px;bottom:-1px;border-width:0 0 2px 2px}
+.frame{position:absolute;inset:2.2dvh 2.8vw;border:1px solid color-mix(in srgb,currentColor 25%,transparent);pointer-events:none}
+.frame:before,.frame:after,.c2,.c3{content:"";position:absolute;width:clamp(34px,7vw,75px);height:clamp(34px,7vw,75px);border:2px solid currentColor;opacity:.8}
+.frame:before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+.frame:after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+.c2{right:-1px;top:-1px;border-left:0;border-bottom:0}.c3{left:-1px;bottom:-1px;border-right:0;border-top:0}
 
-.top,.bottom{
- position:absolute;left:6vw;right:6vw;display:flex;justify-content:space-between;
- font-size:10px;letter-spacing:3px;opacity:.72;text-transform:uppercase;z-index:4
-}
-.top{top:5vh}.bottom{bottom:4vh}
-
-.center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,88vw);text-align:center;z-index:3}
-.scanner{
- width:min(330px,68vw);aspect-ratio:1;margin:auto;position:relative;
- border:1px solid rgba(32,191,255,.35);border-radius:50%;
- box-shadow:0 0 40px rgba(20,170,255,.13),inset 0 0 50px rgba(20,170,255,.07);
-}
-.scanner:before,.scanner:after{
- content:"";position:absolute;border-radius:50%;pointer-events:none
-}
-.scanner:before{inset:7%;border:1px dashed rgba(32,191,255,.55);animation:spin 10s linear infinite}
-.scanner:after{inset:16%;border:1px solid rgba(32,191,255,.2);animation:spinReverse 7s linear infinite}
-.ringProgress{
- position:absolute;inset:1.8%;border-radius:50%;
- background:conic-gradient(var(--blue) 0deg,transparent 0deg);
- -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
- mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 8px));
- transition:background .05s linear;
-}
-.palm{
- position:absolute;left:50%;top:50%;width:52%;height:63%;transform:translate(-50%,-50%);
- filter:drop-shadow(0 0 15px rgba(32,191,255,.75));
-}
+.header,.footer{position:absolute;z-index:5;left:7vw;right:7vw;display:flex;justify-content:space-between;gap:10px;text-transform:uppercase;letter-spacing:clamp(1px,.45vw,4px);font-size:clamp(7px,1.5vw,11px);opacity:.8}
+.header{top:4dvh}.footer{bottom:3dvh}
+.header b,.footer b{font-weight:700}
+.center{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);width:min(92vw,650px);text-align:center}
+.scanner{position:relative;width:min(72vw,420px);height:min(72vw,420px);margin:auto;border:1px solid currentColor;border-radius:50%;box-shadow:0 0 40px color-mix(in srgb,currentColor 20%,transparent),inset 0 0 55px color-mix(in srgb,currentColor 10%,transparent)}
+.scanner:before{content:"";position:absolute;inset:5%;border:1px dashed currentColor;border-radius:50%;opacity:.65;animation:spin 12s linear infinite}
+.scanner:after{content:"";position:absolute;inset:14%;border:1px solid currentColor;border-radius:50%;opacity:.25;animation:spinR 8s linear infinite}
+.progressRing{position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(currentColor 0deg,transparent 0deg);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 11px),#000 calc(100% - 10px));mask:radial-gradient(farthest-side,transparent calc(100% - 11px),#000 calc(100% - 10px));z-index:3}
+.palm{position:absolute;z-index:2;left:50%;top:50%;width:70%;height:82%;transform:translate(-50%,-49%);filter:drop-shadow(0 0 12px currentColor)}
 .palm svg{width:100%;height:100%;overflow:visible}
-.palm path{fill:rgba(20,170,255,.08);stroke:var(--blue);stroke-width:2}
-.palm .line{fill:none;stroke:rgba(100,220,255,.7);stroke-width:1.2}
-.scanBeam{
- position:absolute;left:10%;right:10%;top:50%;height:2px;background:var(--blue);
- box-shadow:0 0 18px 5px rgba(32,191,255,.35);animation:scan 2.1s ease-in-out infinite
-}
-.readout{
- position:absolute;left:7%;top:20%;font-size:9px;line-height:1.8;text-align:left;
- letter-spacing:2px;color:#59d7ff
-}
-.readout.right{left:auto;right:7%;text-align:right}
-.title{margin-top:24px;font-size:clamp(18px,3vw,28px);font-weight:800;letter-spacing:5px;text-shadow:0 0 18px currentColor}
-.sub{margin-top:9px;font-size:10px;letter-spacing:3px;opacity:.68}
-.palmHint{margin-top:16px;font-size:11px;letter-spacing:2px;opacity:.55}
-.progressText{font-size:clamp(50px,9vw,88px);font-weight:900;letter-spacing:4px;text-shadow:0 0 28px currentColor;margin-top:15px}
-.status{font-size:11px;letter-spacing:3px;opacity:.7;margin-top:8px}
+.palmBase{fill:color-mix(in srgb,currentColor 5%,transparent);stroke:currentColor;stroke-width:1.8}
+.fp{fill:none;stroke:currentColor;stroke-width:1;opacity:.9}
+.fp2{fill:none;stroke:currentColor;stroke-width:.7;opacity:.55}
+.beam{position:absolute;z-index:4;left:10%;right:10%;top:50%;height:2px;background:currentColor;box-shadow:0 0 18px 6px color-mix(in srgb,currentColor 45%,transparent);animation:beam 2.2s ease-in-out infinite}
+.readout{position:absolute;z-index:5;top:18%;left:7%;font-size:clamp(6px,1.4vw,10px);line-height:1.65;text-align:left;letter-spacing:1.5px}
+.readout.r{left:auto;right:7%;text-align:right}
+.title{margin-top:clamp(12px,2.8dvh,25px);font-size:clamp(16px,4vw,28px);font-weight:800;letter-spacing:clamp(2px,1vw,6px);text-shadow:0 0 18px currentColor}
+.sub{margin-top:8px;font-size:clamp(7px,1.6vw,11px);letter-spacing:clamp(1px,.6vw,3px);opacity:.65}
+.hint{margin-top:12px;font-size:clamp(7px,1.4vw,10px);letter-spacing:2px;opacity:.45}
 #loading,#ready{display:none}
 #loading.active,#ready.active{display:block}
-
-.ready{color:var(--green)}
-.ready .hud{border-color:rgba(66,255,135,.3)}
-.ready .hud:before,.ready .hud:after,.ready .c2,.ready .c3{border-color:var(--green)}
-.ready #app{}
-.ready .scanner{border-color:rgba(66,255,135,.55);box-shadow:0 0 45px rgba(66,255,135,.18),inset 0 0 50px rgba(66,255,135,.07)}
-.ready .scanner:before,.ready .scanner:after{border-color:rgba(66,255,135,.55)}
-.ready .palm path{stroke:var(--green)}
-.ready .palm .line{stroke:rgba(120,255,170,.72)}
-.ready .scanBeam{background:var(--green);box-shadow:0 0 20px 5px rgba(66,255,135,.4)}
-.ready .ringProgress{background:conic-gradient(var(--green) 360deg,#12351f 360deg)}
-.ready .title,.ready .progressText{color:var(--green)}
-.ready .bottom{color:var(--green)}
-
-.flash{position:absolute;inset:0;background:var(--green);opacity:0;pointer-events:none;z-index:8}
-.flash.go{animation:flash .65s ease-out}
-.fade{animation:fade .5s ease}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes spinReverse{to{transform:rotate(-360deg)}}
-@keyframes scan{0%,100%{transform:translateY(-125px);opacity:.15}50%{transform:translateY(125px);opacity:1}}
+.percent{margin-top:8px;font-size:clamp(50px,14vw,88px);font-weight:900;line-height:1;text-shadow:0 0 28px currentColor}
+.status{margin-top:7px;font-size:clamp(7px,1.5vw,11px);letter-spacing:2.5px;opacity:.72}
+.readyFlash{position:absolute;inset:0;background:#57ff7d;opacity:0;z-index:10;pointer-events:none}
+.readyFlash.go{animation:flash .65s ease-out}
+.shake{animation:deviceShake .34s linear 1}
+.fade{animation:fade .45s ease}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes spinR{to{transform:rotate(-360deg)}}
+@keyframes beam{0%,100%{transform:translateY(-135px);opacity:.1}50%{transform:translateY(135px);opacity:1}}
 @keyframes fade{from{opacity:0;transform:translate(-50%,-46%)}to{opacity:1;transform:translate(-50%,-50%)}}
-@keyframes flash{0%{opacity:0}25%{opacity:.28}100%{opacity:0}}
+@keyframes flash{0%{opacity:0}20%{opacity:.28}100%{opacity:0}}
+@keyframes deviceShake{0%{transform:translate(0,0)}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-2px)}80%{transform:translate(2px,2px)}100%{transform:translate(0,0)}}
+
+@media (orientation:portrait){
+ .center{top:48%;width:94vw}
+ .scanner{width:min(82vw,390px);height:min(82vw,390px)}
+ .palm{width:74%;height:84%}
+ .header{top:3dvh}.footer{bottom:2.5dvh}
+}
+@media (max-width:500px) and (orientation:portrait){
+ .frame{inset:1.5dvh 2vw}.header,.footer{left:6vw;right:6vw;font-size:7px}
+ .scanner{width:min(84vw,330px);height:min(84vw,330px)}
+ .readout{font-size:6px}.title{font-size:17px;letter-spacing:2px}.sub{font-size:8px}
+}
+@media (orientation:landscape){
+ .center{top:50%;width:min(86vw,700px)}
+ .scanner{width:min(58vh,420px);height:min(58vh,420px)}
+}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style>
 </head>
-
 <body>
 <div id="app">
-  <canvas id="particles"></canvas>
+ <canvas id="particles"></canvas>
+ <div class="grid"></div>
+ <div class="frame"><span class="c2"></span><span class="c3"></span></div>
 
-  <div class="hud" id="hud">
-    <span class="c2"></span><span class="c3"></span>
+ <div class="header">
+  <b>AI EVENT CONTROL / BIOMETRIC INTERFACE</b><span id="clock">00:00:00</span>
+ </div>
+ <div class="footer">
+  <span id="leftInfo">PALM INPUT READY</span><span id="rightInfo">SYSTEM STANDBY</span>
+ </div>
+
+ <section class="center" id="standby">
+  <div class="scanner">
+   <div class="progressRing"></div>
+   <div class="readout">AI CORE<br>V2.6.1<br><br>STATUS<br>WAITING</div>
+   <div class="readout r">NETWORK<br>CONNECTED<br><br>SECURITY<br>ACTIVE</div>
+   <div class="palm"><svg viewBox="0 0 200 250">
+    <path class="palmBase" d="M100 238C73 238 49 225 43 200L38 135C37 125 43 118 51 118C59 118 63 124 64 132L68 168L62 82C61 71 68 64 76 64C84 64 89 71 89 80L94 156L90 55C90 44 97 38 105 39C113 40 118 46 118 55L120 157L121 74C121 64 128 58 136 59C144 60 148 67 148 76L149 160L151 100C152 90 159 85 167 87C175 89 178 96 177 106L175 179C173 215 149 238 100 238Z"/>
+    <g id="fingerprint">
+      <path class="fp" d="M67 180C76 155 103 145 123 160C141 174 150 177 165 168"/>
+      <path class="fp" d="M65 192C80 169 104 164 124 176C139 185 151 186 167 178"/>
+      <path class="fp" d="M68 204C83 183 105 181 123 191C138 200 149 198 162 190"/>
+      <path class="fp" d="M78 216C91 201 108 199 124 207C136 213 146 211 156 203"/>
+      <path class="fp2" d="M84 224C97 214 110 214 122 219C131 223 140 222 148 216"/>
+      <path class="fp2" d="M82 167C88 149 105 138 121 142"/>
+      <path class="fp2" d="M94 82C101 105 103 129 103 154"/>
+      <path class="fp2" d="M127 83C132 104 133 132 132 157"/>
+      <path class="fp2" d="M153 108C155 129 153 149 151 162"/>
+      <path class="fp2" d="M72 92C76 116 78 141 78 163"/>
+    </g>
+   </svg></div>
+   <div class="beam"></div>
   </div>
+  <div class="title">PALM AUTHENTICATION</div>
+  <div class="sub">PLACE PALM ON SCREEN TO INITIALIZE</div>
+  <div class="hint">BIOMETRIC CONTACT DETECTION • READY</div>
+ </section>
 
-  <div class="top">
-    <span>AI EVENT CONTROL / BIOMETRIC INTERFACE</span>
-    <span id="clock">00:00:00</span>
+ <section class="center" id="loading">
+  <div class="scanner">
+   <div class="progressRing" id="loadingRing"></div>
+   <div class="readout">BIOMETRIC<br>SCANNING<br>ACTIVE</div>
+   <div class="readout r">AI CORE<br>PROCESSING<br>SECURE</div>
+   <div class="palm"><svg viewBox="0 0 200 250">
+    <path class="palmBase" d="M100 238C73 238 49 225 43 200L38 135C37 125 43 118 51 118C59 118 63 124 64 132L68 168L62 82C61 71 68 64 76 64C84 64 89 71 89 80L94 156L90 55C90 44 97 38 105 39C113 40 118 46 118 55L120 157L121 74C121 64 128 58 136 59C144 60 148 67 148 76L149 160L151 100C152 90 159 85 167 87C175 89 178 96 177 106L175 179C173 215 149 238 100 238Z"/>
+    <g class="fingerprint">
+      <path class="fp" d="M67 180C76 155 103 145 123 160C141 174 150 177 165 168"/><path class="fp" d="M65 192C80 169 104 164 124 176C139 185 151 186 167 178"/><path class="fp" d="M68 204C83 183 105 181 123 191C138 200 149 198 162 190"/><path class="fp" d="M78 216C91 201 108 199 124 207C136 213 146 211 156 203"/><path class="fp2" d="M84 224C97 214 110 214 122 219C131 223 140 222 148 216"/>
+    </g>
+   </svg></div>
+   <div class="beam"></div>
   </div>
+  <div class="title">SYSTEM INITIALIZING</div>
+  <div class="percent" id="percent">0%</div>
+  <div class="status" id="status">PALM PATTERN SCANNING...</div>
+ </section>
 
-  <div class="bottom">
-    <span id="bottomLeft">PALM INPUT READY</span>
-    <span id="bottomRight">SYSTEM STANDBY</span>
+ <section class="center" id="ready">
+  <div class="scanner">
+   <div class="progressRing" id="readyRing"></div>
+   <div class="readout">AI CORE<br>ACTIVE ✓<br><br>STATUS<br>ONLINE ✓</div>
+   <div class="readout r">NETWORK<br>STABLE ✓<br><br>DATA LINK<br>SECURE ✓</div>
+   <div class="palm"><svg viewBox="0 0 200 250">
+    <path class="palmBase" d="M100 238C73 238 49 225 43 200L38 135C37 125 43 118 51 118C59 118 63 124 64 132L68 168L62 82C61 71 68 64 76 64C84 64 89 71 89 80L94 156L90 55C90 44 97 38 105 39C113 40 118 46 118 55L120 157L121 74C121 64 128 58 136 59C144 60 148 67 148 76L149 160L151 100C152 90 159 85 167 87C175 89 178 96 177 106L175 179C173 215 149 238 100 238Z"/>
+    <g class="fingerprint"><path class="fp" d="M67 180C76 155 103 145 123 160C141 174 150 177 165 168"/><path class="fp" d="M65 192C80 169 104 164 124 176C139 185 151 186 167 178"/><path class="fp" d="M68 204C83 183 105 181 123 191C138 200 149 198 162 190"/><path class="fp" d="M78 216C91 201 108 199 124 207C136 213 146 211 156 203"/></g>
+    </svg></div>
   </div>
+  <div class="percent">100%</div>
+  <div class="title">KEGIATAN DIBUKA</div>
+  <div class="sub">SYSTEM ONLINE • ALL SYSTEMS OPERATIONAL</div>
+ </section>
 
-  <!-- STANDBY -->
-  <div class="center" id="standby">
-    <div class="scanner">
-      <div class="ringProgress" id="standbyRing"></div>
-      <div class="readout">PALM SCAN<br>WAITING<br>INPUT AREA</div>
-      <div class="readout right">AI CORE<br>IDLE<br>SECURE</div>
-
-      <div class="palm">
-        <svg viewBox="0 0 200 250" aria-hidden="true">
-          <path d="M100 236 C75 236 50 224 44 201 L39 135 C38 125 44 119 52 119 C59 119 63 124 64 132 L68 169 L62 82 C61 71 68 65 76 65 C84 65 88 71 89 80 L94 157 L90 55 C90 44 97 38 105 39 C113 39 118 46 118 55 L120 157 L121 74 C121 64 128 58 136 59 C144 60 148 67 148 76 L149 160 L151 100 C152 90 159 85 167 87 C175 89 178 96 177 106 L175 179 C173 214 149 236 100 236Z"/>
-          <path class="line" d="M73 183 C83 166 103 160 120 171 C134 180 147 180 161 173"/>
-          <path class="line" d="M68 198 C84 183 103 181 119 191 C135 201 149 198 163 188"/>
-          <path class="line" d="M86 211 C101 202 117 204 132 213"/>
-          <path class="line" d="M96 80 C103 94 105 119 105 150"/>
-          <path class="line" d="M126 83 C132 104 133 132 132 158"/>
-        </svg>
-      </div>
-      <div class="scanBeam"></div>
-    </div>
-    <div class="title">PALM AUTHENTICATION</div>
-    <div class="sub">PLACE PALM ON SCREEN TO INITIALIZE</div>
-    <div class="palmHint">PALM CONTACT DETECTION • READY</div>
-  </div>
-
-  <!-- LOADING -->
-  <div class="center" id="loading">
-    <div class="scanner">
-      <div class="ringProgress" id="loadingRing"></div>
-      <div class="readout">BIOMETRIC<br>SCANNING<br>ACTIVE</div>
-      <div class="readout right">AI CORE<br>PROCESSING<br>SECURE</div>
-      <div class="palm">
-        <svg viewBox="0 0 200 250">
-          <path d="M100 236 C75 236 50 224 44 201 L39 135 C38 125 44 119 52 119 C59 119 63 124 64 132 L68 169 L62 82 C61 71 68 65 76 65 C84 65 88 71 89 80 L94 157 L90 55 C90 44 97 38 105 39 C113 39 118 46 118 55 L120 157 L121 74 C121 64 128 58 136 59 C144 60 148 67 148 76 L149 160 L151 100 C152 90 159 85 167 87 C175 89 178 96 177 106 L175 179 C173 214 149 236 100 236Z"/>
-          <path class="line" d="M73 183 C83 166 103 160 120 171 C134 180 147 180 161 173"/>
-          <path class="line" d="M68 198 C84 183 103 181 119 191 C135 201 149 198 163 188"/>
-          <path class="line" d="M86 211 C101 202 117 204 132 213"/>
-        </svg>
-      </div>
-      <div class="scanBeam"></div>
-    </div>
-    <div class="title">SYSTEM INITIALIZING</div>
-    <div class="progressText" id="percent">0%</div>
-    <div class="status" id="status">AI CORE ACTIVATING...</div>
-  </div>
-
-  <!-- READY -->
-  <div class="center" id="ready">
-    <div class="scanner">
-      <div class="ringProgress" id="readyRing"></div>
-      <div class="readout">AI CORE<br>ONLINE<br>ACTIVE</div>
-      <div class="readout right">SYSTEM READY<br>CONNECTION<br>STABLE</div>
-      <div class="palm">
-        <svg viewBox="0 0 200 250">
-          <path d="M100 236 C75 236 50 224 44 201 L39 135 C38 125 44 119 52 119 C59 119 63 124 64 132 L68 169 L62 82 C61 71 68 65 76 65 C84 65 88 71 89 80 L94 157 L90 55 C90 44 97 38 105 39 C113 39 118 46 118 55 L120 157 L121 74 C121 64 128 58 136 59 C144 60 148 67 148 76 L149 160 L151 100 C152 90 159 85 167 87 C175 89 178 96 177 106 L175 179 C173 214 149 236 100 236Z"/>
-          <path class="line" d="M73 183 C83 166 103 160 120 171 C134 180 147 180 161 173"/>
-          <path class="line" d="M68 198 C84 183 103 181 119 191 C135 201 149 198 163 188"/>
-          <path class="line" d="M86 211 C101 202 117 204 132 213"/>
-        </svg>
-      </div>
-    </div>
-    <div class="progressText">100%</div>
-    <div class="title">KEGIATAN DIBUKA</div>
-    <div class="sub">SYSTEM ONLINE • ALL SYSTEMS OPERATIONAL</div>
-  </div>
-
-  <div class="flash" id="flash"></div>
-  <div class="scanlines"></div>
-  <div class="vignette"></div>
+ <div class="readyFlash" id="flash"></div>
+ <div class="scanlines"></div><div class="vignette"></div>
 </div>
 
 <script>
-/*
-  PALM TOUCH DETECTION
-  --------------------
-  Browser tidak bisa benar-benar mengetahui "telapak tangan" secara universal.
-  Sistem menggunakan ukuran area sentuhan (PointerEvent width/height) sebagai
-  indikator utama. Jika tablet melaporkan ukuran sentuhan kecil, mode fallback
-  memakai durasi sentuhan agar tetap dapat dipakai.
-*/
-
-const app = document.getElementById('app');
-const standby = document.getElementById('standby');
-const loading = document.getElementById('loading');
-const ready = document.getElementById('ready');
-const percent = document.getElementById('percent');
-const status = document.getElementById('status');
-const fillRing = document.getElementById('loadingRing');
-const standbyRing = document.getElementById('standbyRing');
-const readyRing = document.getElementById('readyRing');
-const flash = document.getElementById('flash');
-
-let started = false;
-let touchStart = null;
-let palmTimer = null;
-
-// Ubah nilai ini jika tablet Anda membaca ukuran telapak lebih kecil/besar.
-const PALM_MIN_SIZE = 42;
-const PALM_HOLD_MS = 180;
+const app=document.getElementById('app'), standby=document.getElementById('standby');
+const loading=document.getElementById('loading'), ready=document.getElementById('ready');
+const ring=document.getElementById('loadingRing'), readyRing=document.getElementById('readyRing');
+const percent=document.getElementById('percent'), status=document.getElementById('status');
+const flash=document.getElementById('flash');
+let started=false, touchStart=0, palmTimer=null;
 
 function fullscreen(){
-  const el=document.documentElement;
-  if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+ const el=document.documentElement;
+ if(el.requestFullscreen) el.requestFullscreen().catch(()=>{});
 }
-
-function setRing(el, p, color='blue'){
-  const deg = Math.max(0,Math.min(100,p))*3.6;
-  const c = color==='green' ? 'var(--green)' : 'var(--blue)';
-  const bg = color==='green' ? '#12351f' : 'rgba(4,35,55,.8)';
-  el.style.background=`conic-gradient(${c} ${deg}deg, ${bg} ${deg}deg)`;
+function vibrate(pattern){
+ if('vibrate' in navigator){
+   try{ navigator.vibrate(pattern); }catch(e){}
+ }
 }
-
-function startOpening(){
-  if(started) return;
-  started=true;
-  fullscreen();
-  standby.style.display='none';
-  loading.classList.add('active','fade');
-  document.getElementById('bottomLeft').textContent='BIOMETRIC INPUT ACCEPTED';
-  document.getElementById('bottomRight').textContent='SYSTEM INITIALIZING';
-
-  const start=performance.now();
-  const duration=2000;
-
-  function tick(now){
-    const p=Math.min((now-start)/duration,1);
-    const v=Math.floor(p*100);
-    percent.textContent=v+'%';
-    setRing(fillRing,v,'blue');
-
-    if(v<25) status.textContent='PALM PATTERN SCANNING...';
-    else if(v<50) status.textContent='AI CORE ACTIVATING...';
-    else if(v<75) status.textContent='SYNCHRONIZING EVENT SYSTEM...';
-    else if(v<100) status.textContent='FINALIZING INITIALIZATION...';
-    else status.textContent='SYSTEM READY';
-
-    if(p<1) requestAnimationFrame(tick);
-    else setTimeout(finish,180);
-  }
-  requestAnimationFrame(tick);
+function setRing(el,p){
+ const deg=Math.max(0,Math.min(100,p))*3.6;
+ el.style.background=`conic-gradient(currentColor ${deg}deg, rgba(0,20,32,.75) ${deg}deg)`;
 }
-
 function finish(){
-  loading.style.display='none';
-  app.classList.add('ready');
-  ready.classList.add('active','fade');
-  setRing(readyRing,100,'green');
-  document.getElementById('bottomLeft').textContent='PALM AUTHENTICATED';
-  document.getElementById('bottomRight').textContent='SYSTEM ONLINE';
-  flash.classList.add('go');
-  setTimeout(()=>flash.classList.remove('go'),700);
+ loading.style.display='none';
+ app.classList.add('green');
+ ready.classList.add('active','fade');
+ setRing(readyRing,100);
+ document.getElementById('leftInfo').textContent='PALM AUTHENTICATED';
+ document.getElementById('rightInfo').textContent='SYSTEM ONLINE';
+ flash.classList.add('go');
+ // Getaran saat 100%. Pola pendek-ganda agar terasa sebagai konfirmasi.
+ vibrate([90,45,130,45,180]);
+ setTimeout(()=>flash.classList.remove('go'),700);
 }
-
-/* Deteksi area sentuhan */
-function pointerDown(e){
-  if(started || e.pointerType==='mouse') return;
-
-  const width=e.width || 0;
-  const height=e.height || 0;
-  const area=Math.max(width,height);
-  const likelyPalm=area>=PALM_MIN_SIZE;
-
-  touchStart={time:performance.now(), likelyPalm};
-
-  clearTimeout(palmTimer);
-
-  // Jika perangkat benar-benar melaporkan area telapak besar, mulai cepat.
-  if(likelyPalm){
-    palmTimer=setTimeout(startOpening,80);
-  }else{
-    // Fallback: telapak menempel sedikit lebih lama daripada tap satu jari.
-    palmTimer=setTimeout(()=>{
-      if(touchStart && performance.now()-touchStart.time>=PALM_HOLD_MS){
-        startOpening();
-      }
-    },PALM_HOLD_MS);
-  }
+function startOpening(){
+ if(started)return;
+ started=true; fullscreen(); vibrate(25);
+ standby.style.display='none';
+ loading.classList.add('active','fade');
+ document.getElementById('leftInfo').textContent='BIOMETRIC INPUT ACCEPTED';
+ document.getElementById('rightInfo').textContent='SYSTEM INITIALIZING';
+ const t0=performance.now(), duration=2000;
+ function tick(t){
+   const p=Math.min((t-t0)/duration,1), v=Math.floor(p*100);
+   percent.textContent=v+'%'; setRing(ring,v);
+   if(v<20)status.textContent='PALM PATTERN SCANNING...';
+   else if(v<45)status.textContent='AI CORE ACTIVATING...';
+   else if(v<70)status.textContent='SYNCHRONIZING EVENT SYSTEM...';
+   else if(v<100)status.textContent='FINALIZING INITIALIZATION...';
+   else status.textContent='SYSTEM READY';
+   if(p<1)requestAnimationFrame(tick); else setTimeout(finish,100);
+ }
+ requestAnimationFrame(tick);
 }
-
-function pointerUp(){
-  clearTimeout(palmTimer);
-  touchStart=null;
+/*
+  Palm-first touch detection:
+  1) Jika browser memberikan width/height area sentuh besar, dianggap palm.
+  2) Jika browser tidak memberikan area, gunakan hold singkat 180 ms sebagai fallback.
+  Ini tidak membaca biometrik telapak secara literal; browser tidak memberi akses
+  ke bentuk telapak tanpa sensor/AI khusus.
+*/
+function down(e){
+ if(started || e.pointerType==='mouse')return;
+ clearTimeout(palmTimer);
+ const size=Math.max(e.width||0,e.height||0);
+ const likelyPalm=size>=42;
+ touchStart=performance.now();
+ palmTimer=setTimeout(()=>{ if(likelyPalm || performance.now()-touchStart>=180)startOpening(); },likelyPalm?70:180);
 }
+function up(){clearTimeout(palmTimer);touchStart=0}
+app.addEventListener('pointerdown',down,{passive:true});
+app.addEventListener('pointerup',up,{passive:true});
+app.addEventListener('pointercancel',up,{passive:true});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&!started)startOpening()});
+setInterval(()=>document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-GB'),1000);
 
-app.addEventListener('pointerdown',pointerDown,{passive:true});
-app.addEventListener('pointerup',pointerUp,{passive:true});
-app.addEventListener('pointercancel',pointerUp,{passive:true});
-
-/* Keyboard untuk pengujian di PC */
-document.addEventListener('keydown',e=>{
-  if((e.key==='Enter'||e.key===' ')&&!started) startOpening();
-});
-
-/* Jam */
-setInterval(()=>{
-  document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-GB');
-},1000);
-
-/* Background particles */
-const canvas=document.getElementById('particles');
-const ctx=canvas.getContext('2d');
-let w,h,pts=[];
-function resize(){
-  w=canvas.width=innerWidth;
-  h=canvas.height=innerHeight;
-  pts=Array.from({length:65},()=>({
-    x:Math.random()*w,y:Math.random()*h,
-    s:Math.random()*1.5+.3,v:Math.random()*.35+.05
-  }));
-}
-function draw(){
-  ctx.clearRect(0,0,w,h);
-  ctx.fillStyle='rgba(55,190,255,.65)';
-  pts.forEach(p=>{
-    p.y-=p.v;
-    if(p.y<0)p.y=h;
-    ctx.fillRect(p.x,p.y,p.s,p.s);
-  });
-  requestAnimationFrame(draw);
-}
-addEventListener('resize',resize);
-resize();draw();
+// Background particles
+const c=document.getElementById('particles'),ctx=c.getContext('2d');let W,H,pts=[];
+function resize(){W=c.width=innerWidth;H=c.height=innerHeight;pts=Array.from({length:65},()=>({x:Math.random()*W,y:Math.random()*H,s:Math.random()*1.4+.3,v:Math.random()*.35+.04}))}
+function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle=getComputedStyle(app).color;pts.forEach(p=>{p.y-=p.v;if(p.y<0)p.y=H;ctx.fillRect(p.x,p.y,p.s,p.s)});requestAnimationFrame(draw)}
+addEventListener('resize',resize);resize();draw();
 </script>
 </body>
 </html>
