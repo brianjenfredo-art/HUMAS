@@ -332,6 +332,8 @@ body{
     <path d="M20 4v7h-7"/>
   </svg>
 </button>
+
+<audio id="eventSound" src="sound.mp3" preload="auto" playsinline></audio>
 <div class="scanlines"></div>
   <div class="vignette"></div>
 
@@ -352,6 +354,7 @@ const flash = document.getElementById('flash');
 
 let started = false;
 let resetLock = false;
+let audioUnlocked = false;
 
 /* Durasi loading */
 const LOADING_DURATION = 500;
@@ -422,6 +425,14 @@ function resetSystem(){
 
   flash.classList.remove('go');
 
+  const sound = document.getElementById('eventSound');
+  if(sound){
+    try{
+      sound.pause();
+      sound.currentTime = 0;
+    }catch(e){}
+  }
+
   vibrate(25);
 
   setTimeout(()=>{
@@ -438,13 +449,25 @@ function finishOpening(){
   if(!started) return;
 
   // Tetap menampilkan loading screen dan angka 100%.
-  // Hanya warna sistem yang berubah dari biru menjadi hijau.
   app.classList.add('green');
 
   percent.textContent='100%';
   setRing(ring,100);
 
+  // Getaran Android
   vibrate([100,50,180]);
+
+  // Suara konfirmasi
+  const sound = document.getElementById('eventSound');
+  if(sound){
+    try{
+      sound.currentTime = 0;
+      const playPromise = sound.play();
+      if(playPromise && playPromise.catch){
+        playPromise.catch(()=>{});
+      }
+    }catch(e){}
+  }
 
   flash.classList.add('go');
 
@@ -460,6 +483,26 @@ function finishOpening(){
 function startOpening(){
 
   if(started || resetLock) return;
+
+  // Unlock audio during the user gesture on Android/Chrome.
+  const sound = document.getElementById('eventSound');
+  if(sound && !audioUnlocked){
+    try{
+      sound.muted = true;
+      sound.currentTime = 0;
+      const p = sound.play();
+      if(p && p.then){
+        p.then(()=>{
+          sound.pause();
+          sound.currentTime = 0;
+          sound.muted = false;
+          audioUnlocked = true;
+        }).catch(()=>{
+          sound.muted = false;
+        });
+      }
+    }catch(e){}
+  }
 
   started=true;
 
